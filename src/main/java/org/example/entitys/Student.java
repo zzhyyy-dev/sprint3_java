@@ -7,22 +7,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Administrator {
+public class Student {
 
     public static void main(String[] args) {
 
-        getAllAdministrators();
-//        createAdministrator("gustavo", "email@example.com", "password123");
-//        readAdministrator(2);
-//        updateAdministrator(3, "novo_nome", "new_email@example.com", "new_password123");
-//        deleteAdministrator(4);
+//        getAllStudents();
+        createStudent("gustavo", "email@example.com", "password123", "1");
+//        readStudent(2);
+//        updateStudent(3, "novo_nome", "new_email@example.com", "new_password123");
+//        deleteStudent(4);
     }
 
 
-    public static void getAllAdministrators() {
+    public static void getAllStudents() {
         Connection connection = null;
         try {
-            String entity = "administrator";
+            String entity = "Student";
             connection = DatabaseUtil.getConnection();
 
             String selectSQL = "SELECT * FROM " + entity;
@@ -48,17 +48,18 @@ public class Administrator {
     }
 
 
-    public static void createAdministrator(String name, String email, String password) {
+    public static void createStudent(String name, String email, String password, String classWork) {
         Connection connection = null;
         try {
-            String entity = "administrator";
+            String entity = "Student";
             connection = DatabaseUtil.getConnection();
 
-            String insertSQL = "INSERT INTO " + entity + " (name, email, password) VALUES (?, ?, ?)";
+            String insertSQL = "INSERT INTO " + entity + " (name, email, password, class) VALUES (?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, email);
                 preparedStatement.setString(3, password);
+                preparedStatement.setString(4, classWork);
 
                 preparedStatement.executeUpdate();
                 System.out.println(entity + " inserido com sucesso.");
@@ -71,10 +72,10 @@ public class Administrator {
         }
     }
 
-    public static void readAdministrator(int id) {
+    public static void readStudent(int id) {
         Connection connection = null;
         try {
-            String entity = "administrator";
+            String entity = "Student";
             connection = DatabaseUtil.getConnection();
 
             String selectSQL = "SELECT * FROM " + entity + " WHERE id = ?";
@@ -100,10 +101,10 @@ public class Administrator {
         }
     }
 
-    public static void updateAdministrator(int id, String newName, String newEmail, String newPassword) {
+    public static void updateStudent(int id, String newName, String newEmail, String newPassword) {
         Connection connection = null;
         try {
-            String entity = "administrator";
+            String entity = "Student";
             connection = DatabaseUtil.getConnection();
 
             String updateSQL = "UPDATE " + entity + " SET name = ?, email = ?, password = ? WHERE id = ?";
@@ -128,26 +129,26 @@ public class Administrator {
         }
     }
 
-   public static void deleteAdministrator(int id) {
-       Connection connection = null;
-       try {
-            String entity = "administrator";
+    public static void deleteStudent(int id) {
+        Connection connection = null;
+        try {
+            String entity = "Student";
             connection = DatabaseUtil.getConnection();
 
-           String deleteSQL = "DELETE FROM " + entity + " WHERE id = ?";
+            String deleteSQL = "DELETE FROM " + entity + " WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
                 preparedStatement.setInt(1, id);
 
-               int rowsDeleted = preparedStatement.executeUpdate();
+                int rowsDeleted = preparedStatement.executeUpdate();
                 if (rowsDeleted > 0) {
                     System.out.println(entity + " deletado com sucesso.");
                 } else {
                     System.out.println(entity + " com ID " + id + " não encontrado.");
                 }
-           }
+            }
 
         } catch (SQLException e) {
-           e.printStackTrace();
+            e.printStackTrace();
         } finally {
             DatabaseUtil.closeConnection(connection);
         }
