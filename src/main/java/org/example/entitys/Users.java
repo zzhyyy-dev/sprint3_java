@@ -16,7 +16,7 @@ public class Users {
         try {
             connection = DatabaseUtil.getConnection();
 
-            String selectSQL = "SELECT * FROM " + userType + " WHERE email = ? AND password = ?";
+            String selectSQL = "SELECT * FROM " + userType + " WHERE EMAIL = ? AND PASSWORD = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
                 preparedStatement.setString(1, email);
                 preparedStatement.setString(2, password);
