@@ -6,62 +6,42 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class Administrator {
-
-    public static void main(String[] args) {
-
-        getAllAdministrators();
-//        createAdministrator("gustavo", "email@example.com", "password123");
-//        readAdministrator(2);
-//        updateAdministrator(3, "novo_nome", "new_email@example.com", "new_password123");
-//        deleteAdministrator(4);
-    }
+    private SchoolClass classManager = new SchoolClass();
 
 
-    public static void getAllAdministrators() {
+    public void createUser(String userType, String name, String email, String password, Integer classId) {
         Connection connection = null;
         try {
-            String entity = "administrator";
             connection = DatabaseUtil.getConnection();
 
-            String selectSQL = "SELECT * FROM " + entity;
-            try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
-
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int id = resultSet.getInt("id");
-                        String name = resultSet.getString("name");
-                        String email = resultSet.getString("email");
-                        String password = resultSet.getString("password");
-
-                        System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Password: " + password);
-                    }
-                }
+            String insertUserSQL;
+            if (userType.equalsIgnoreCase("student")) {
+                insertUserSQL = "INSERT INTO student (name, email, password, class_id) VALUES (?, ?, ?, ?)";
+            } else if (userType.equalsIgnoreCase("teacher")) {
+                insertUserSQL = "INSERT INTO teacher (name, email, password) VALUES (?, ?, ?)";
+            } else {
+                System.out.println("Tipo de usuário inválido.");
+                return;
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DatabaseUtil.closeConnection(connection);
-        }
-    }
-
-
-    public static void createAdministrator(String name, String email, String password) {
-        Connection connection = null;
-        try {
-            String entity = "administrator";
-            connection = DatabaseUtil.getConnection();
-
-            String insertSQL = "INSERT INTO " + entity + " (name, email, password) VALUES (?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertUserSQL)) {
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, email);
                 preparedStatement.setString(3, password);
 
+                if (userType.equalsIgnoreCase("student")) {
+                    if (classId != null) {
+                        preparedStatement.setInt(4, classId);
+                    } else {
+                        preparedStatement.setNull(4, java.sql.Types.INTEGER);
+                    }
+                }
+
                 preparedStatement.executeUpdate();
-                System.out.println(entity + " inserido com sucesso.");
+                System.out.println(userType + " criado com sucesso.");
             }
 
         } catch (SQLException e) {
@@ -71,13 +51,12 @@ public class Administrator {
         }
     }
 
-    public static void readAdministrator(int id) {
+    public void readUser(String userType, int id) {
         Connection connection = null;
         try {
-            String entity = "administrator";
             connection = DatabaseUtil.getConnection();
 
-            String selectSQL = "SELECT * FROM " + entity + " WHERE id = ?";
+            String selectSQL = "SELECT * FROM " + userType + " WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
                 preparedStatement.setInt(1, id);
 
@@ -87,8 +66,14 @@ public class Administrator {
                         String email = resultSet.getString("email");
                         String password = resultSet.getString("password");
                         System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Password: " + password);
+
+
+                        if (userType.equalsIgnoreCase("student")) {
+                            int classId = resultSet.getInt("class_id");
+                            System.out.println("Class ID: " + (resultSet.wasNull() ? "None" : classId));
+                        }
                     } else {
-                        System.out.println(entity + " com ID " + id + " não encontrado.");
+                        System.out.println(userType + " com ID " + id + " não encontrado.");
                     }
                 }
             }
@@ -100,13 +85,13 @@ public class Administrator {
         }
     }
 
-    public static void updateAdministrator(int id, String newName, String newEmail, String newPassword) {
+
+    public void updateUser(String userType, int id, String newName, String newEmail, String newPassword) {
         Connection connection = null;
         try {
-            String entity = "administrator";
             connection = DatabaseUtil.getConnection();
 
-            String updateSQL = "UPDATE " + entity + " SET name = ?, email = ?, password = ? WHERE id = ?";
+            String updateSQL = "UPDATE " + userType + " SET name = ?, email = ?, password = ? WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
                 preparedStatement.setString(1, newName);
                 preparedStatement.setString(2, newEmail);
@@ -115,9 +100,9 @@ public class Administrator {
 
                 int rowsUpdated = preparedStatement.executeUpdate();
                 if (rowsUpdated > 0) {
-                    System.out.println(entity + " atualizado com sucesso.");
+                    System.out.println(userType + " atualizado com sucesso.");
                 } else {
-                    System.out.println(entity + " com ID " + id + " não encontrado.");
+                    System.out.println(userType + " com ID " + id + " não encontrado.");
                 }
             }
 
@@ -128,30 +113,52 @@ public class Administrator {
         }
     }
 
-   public static void deleteAdministrator(int id) {
-       Connection connection = null;
-       try {
-            String entity = "administrator";
+
+    public void deleteUser(String userType, int id) {
+        Connection connection = null;
+        try {
             connection = DatabaseUtil.getConnection();
 
-           String deleteSQL = "DELETE FROM " + entity + " WHERE id = ?";
+            String deleteSQL = "DELETE FROM " + userType + " WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
                 preparedStatement.setInt(1, id);
 
-               int rowsDeleted = preparedStatement.executeUpdate();
+                int rowsDeleted = preparedStatement.executeUpdate();
                 if (rowsDeleted > 0) {
-                    System.out.println(entity + " deletado com sucesso.");
+                    System.out.println(userType + " deletado com sucesso.");
                 } else {
-                    System.out.println(entity + " com ID " + id + " não encontrado.");
+                    System.out.println(userType + " com ID " + id + " não encontrado.");
                 }
-           }
+            }
 
         } catch (SQLException e) {
-           e.printStackTrace();
+            e.printStackTrace();
         } finally {
             DatabaseUtil.closeConnection(connection);
         }
     }
 
 
+    public void createClass(String name, String description, int teacherId, List<Integer> studentIds) {
+        classManager.createClass(name, description, teacherId, studentIds);
+    }
+
+
+    public void deleteClass(int classId) {
+        classManager.deleteClass(classId);
+    }
+
+
+    public void updateClass(int classId, Integer newTeacherId, List<Integer> newStudentIds) {
+        classManager.updateClass(classId, newTeacherId, newStudentIds);
+    }
+
+    public void updateStudentClass(int studentId, Integer classId) {
+        classManager.updateStudentClass(studentId, classId);
+    }
+
+
+    public void viewAllClasses() {
+        classManager.viewAllClasses();
+    }
 }
