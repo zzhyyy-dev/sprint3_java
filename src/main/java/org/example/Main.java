@@ -15,7 +15,6 @@ public class Main {
         Users user = new Users();
         int loginAttempts = 0;
 
-
         while (loginAttempts < 3) {
             System.out.println("===== Sistema de Login =====");
             System.out.print("Digite o tipo de usuário (teacher, student, administrator): ");
@@ -33,35 +32,27 @@ public class Main {
             String password = scanner.nextLine();
 
             if (user.login(userType, email, password)) {
-
                 switch (user.getUserType()) {
                     case "administrator":
                         administratorMenu(scanner);
                         break;
-
                     case "teacher":
                         teacherMenu(scanner);
                         break;
-
                     case "student":
                         studentMenu(scanner, user.getUserId());
                         break;
-
                     default:
                         System.out.println("Tipo de usuário desconhecido.");
                 }
                 return;
             } else {
-
                 loginAttempts++;
                 System.out.println("Falha no login. Tentativa " + loginAttempts + " de 3.");
             }
         }
-
-
         System.out.println("Número máximo de tentativas alcançado. Programa encerrado.");
     }
-
 
     private static void administratorMenu(Scanner scanner) {
         Administrator admin = new Administrator();
@@ -75,7 +66,7 @@ public class Main {
             System.out.println("4 - Deletar usuário");
             System.out.println("5 - Criar uma nova classe");
             System.out.println("6 - Deletar uma classe");
-            System.out.println("7 - Atualizar uma classe (alterar professor ou alunos)");
+            System.out.println("7 - Atualizar professor de uma classe");
             System.out.println("8 - Visualizar todas as classes");
             System.out.println("9 - Atualizar a classe de um aluno");
             System.out.println("10 - Sair");
@@ -85,7 +76,6 @@ public class Main {
 
             switch (choice) {
                 case 1:
-
                     System.out.print("Digite o tipo de usuário para adicionar (teacher, student): ");
                     String userType = scanner.nextLine().toLowerCase();
                     System.out.print("Digite o nome do usuário: ");
@@ -99,7 +89,7 @@ public class Main {
                     if (userType.equals("student")) {
                         System.out.print("Digite o ID da classe para associar ao aluno (ou 0 para nenhum): ");
                         int inputClassId = scanner.nextInt();
-                        scanner.nextLine(); 
+                        scanner.nextLine();
                         classId = (inputClassId != 0) ? inputClassId : null;
                     }
 
@@ -111,7 +101,7 @@ public class Main {
                     userType = scanner.nextLine().toLowerCase();
                     System.out.print("Digite o ID do usuário: ");
                     int userId = scanner.nextInt();
-                    scanner.nextLine(); 
+                    scanner.nextLine();
                     admin.readUser(userType, userId);
                     break;
 
@@ -135,7 +125,7 @@ public class Main {
                     userType = scanner.nextLine().toLowerCase();
                     System.out.print("Digite o ID do usuário: ");
                     userId = scanner.nextInt();
-                    scanner.nextLine(); 
+                    scanner.nextLine();
                     admin.deleteUser(userType, userId);
                     break;
 
@@ -148,19 +138,7 @@ public class Main {
                     int teacherId = scanner.nextInt();
                     scanner.nextLine();
 
-                    // Add students to the class
-                    List<Integer> studentIds = new ArrayList<>();
-                    System.out.print("Digite o número de alunos que deseja associar à classe: ");
-                    int numberOfStudents = scanner.nextInt();
-                    scanner.nextLine();
-                    for (int i = 0; i < numberOfStudents; i++) {
-                        System.out.print("Digite o ID do aluno " + (i + 1) + ": ");
-                        int studentId = scanner.nextInt();
-                        scanner.nextLine();
-                        studentIds.add(studentId);
-                    }
-
-                    admin.createClass(className, description, teacherId, studentIds);
+                    admin.createClass(className, description, teacherId);
                     break;
 
                 case 6:
@@ -174,25 +152,12 @@ public class Main {
                     System.out.print("Digite o ID da classe a ser atualizada: ");
                     int classIdToUpdate = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.print("Digite o novo ID do professor (ou 0 para não alterar): ");
+                    System.out.print("Digite o novo ID do professor: ");
                     int newTeacherId = scanner.nextInt();
                     scanner.nextLine();
                     Integer teacherIdToUpdate = (newTeacherId != 0) ? newTeacherId : null;
 
-                    List<Integer> newStudentIds = new ArrayList<>();
-                    System.out.print("Digite o número de alunos que deseja associar à classe (0 para não alterar): ");
-                    int newNumberOfStudents = scanner.nextInt();
-                    scanner.nextLine();
-                    if (newNumberOfStudents > 0) {
-                        for (int i = 0; i < newNumberOfStudents; i++) {
-                            System.out.print("Digite o ID do novo aluno " + (i + 1) + ": ");
-                            int studentId = scanner.nextInt();
-                            scanner.nextLine();
-                            newStudentIds.add(studentId);
-                        }
-                    }
-
-                    admin.updateClass(classIdToUpdate, teacherIdToUpdate, newStudentIds);
+                    admin.updateClass(classIdToUpdate, teacherIdToUpdate);
                     break;
 
                 case 8:
@@ -219,8 +184,6 @@ public class Main {
             }
         }
     }
-
-
 
     private static void teacherMenu(Scanner scanner) {
         Teacher teacher = new Teacher();
@@ -250,7 +213,6 @@ public class Main {
             }
         }
     }
-
 
     private static void studentMenu(Scanner scanner, int studentId) {
         Student student = new Student();

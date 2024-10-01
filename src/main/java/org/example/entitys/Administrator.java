@@ -119,10 +119,34 @@ public class Administrator {
         try {
             connection = DatabaseUtil.getConnection();
 
+            if (userType.equalsIgnoreCase("student")) {
+
+                String deleteChallengeSQL = "DELETE FROM challenge_student WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(deleteChallengeSQL)) {
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Associações do aluno na tabela challenge_student removidas.");
+                }
+
+
+                String deleteArcadeSQL = "DELETE FROM arcade WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(deleteArcadeSQL)) {
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Associações do aluno na tabela arcade removidas.");
+                }
+
+                String deleteCompetencesSQL = "DELETE FROM student_competences WHERE student_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(deleteCompetencesSQL)) {
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Associações do aluno na tabela student_competences removidas.");
+                }
+            }
+
             String deleteSQL = "DELETE FROM " + userType + " WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
                 preparedStatement.setInt(1, id);
-
                 int rowsDeleted = preparedStatement.executeUpdate();
                 if (rowsDeleted > 0) {
                     System.out.println(userType + " deletado com sucesso.");
@@ -139,8 +163,11 @@ public class Administrator {
     }
 
 
-    public void createClass(String name, String description, int teacherId, List<Integer> studentIds) {
-        classManager.createClass(name, description, teacherId, studentIds);
+
+
+
+    public void createClass(String name, String description, int teacherId) {
+        classManager.createClass(name, description, teacherId);
     }
 
 
@@ -149,8 +176,8 @@ public class Administrator {
     }
 
 
-    public void updateClass(int classId, Integer newTeacherId, List<Integer> newStudentIds) {
-        classManager.updateClass(classId, newTeacherId, newStudentIds);
+    public void updateClass(int classId, Integer newTeacherId) {
+        classManager.updateClass(classId, newTeacherId);
     }
 
     public void updateStudentClass(int studentId, Integer classId) {

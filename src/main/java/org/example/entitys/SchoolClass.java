@@ -10,8 +10,7 @@ import java.util.List;
 
 public class SchoolClass {
 
-
-    public void createClass(String name, String description, int teacherId, List<Integer> studentIds) {
+    public void createClass(String name, String description, int teacherId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
@@ -22,7 +21,6 @@ public class SchoolClass {
                 preparedStatement.setString(2, description);
                 preparedStatement.setInt(3, teacherId);
 
-
                 preparedStatement.executeUpdate();
                 ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
                 int classId = -1;
@@ -30,14 +28,8 @@ public class SchoolClass {
                     classId = generatedKeys.getInt(1);
                 }
 
-
                 if (classId != -1) {
                     System.out.println("Classe criada com sucesso. ID da Classe: " + classId);
-
-                    // Associate students with the new class by updating their class_id
-                    for (int studentId : studentIds) {
-                        updateStudentClass(studentId, classId);
-                    }
                 } else {
                     System.out.println("Erro ao criar a classe. ID da classe não gerado.");
                 }
@@ -79,13 +71,23 @@ public class SchoolClass {
         }
     }
 
+
     public void deleteClass(int classId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
-            String deleteSQL = "DELETE FROM class WHERE id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            // Atualiza o class_id dos alunos associados à classe para NULL antes de deletar a classe
+            String updateStudentsSQL = "UPDATE student SET class_id = NULL WHERE class_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateStudentsSQL)) {
+                preparedStatement.setInt(1, classId);
+                preparedStatement.executeUpdate();
+                System.out.println("Alunos associados à classe com ID " + classId + " foram desassociados.");
+            }
+
+            // Depois de atualizar os alunos, agora é seguro deletar a classe
+            String deleteClassSQL = "DELETE FROM class WHERE id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteClassSQL)) {
                 preparedStatement.setInt(1, classId);
 
                 int rowsDeleted = preparedStatement.executeUpdate();
@@ -103,11 +105,12 @@ public class SchoolClass {
         }
     }
 
-    public void updateClass(int classId, Integer newTeacherId, List<Integer> newStudentIds) {
+    public void updateClass(int classId, Integer newTeacherId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
+            // Atualiza o professor da classe
             if (newTeacherId != null) {
                 String updateTeacherSQL = "UPDATE class SET teacher_id = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(updateTeacherSQL)) {
@@ -118,30 +121,14 @@ public class SchoolClass {
                 }
             }
 
-            if (newStudentIds != null && !newStudentIds.isEmpty()) {
-                String deleteStudentsSQL = "DELETE FROM class_students WHERE class_id = ?";
-                try (PreparedStatement preparedStatement = connection.prepareStatement(deleteStudentsSQL)) {
-                    preparedStatement.setInt(1, classId);
-                    preparedStatement.executeUpdate();
-                }
-
-                for (int studentId : newStudentIds) {
-                    String addStudentSQL = "INSERT INTO class_students (class_id, student_id) VALUES (?, ?)";
-                    try (PreparedStatement preparedStatement = connection.prepareStatement(addStudentSQL)) {
-                        preparedStatement.setInt(1, classId);
-                        preparedStatement.setInt(2, studentId);
-                        preparedStatement.executeUpdate();
-                    }
-                }
-                System.out.println("Alunos da classe atualizados com sucesso.");
-            }
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DatabaseUtil.closeConnection(connection);
         }
     }
+
+
 
     public void viewAllClasses() {
         Connection connection = null;
@@ -167,5 +154,4 @@ public class SchoolClass {
             DatabaseUtil.closeConnection(connection);
         }
     }
-
 }
