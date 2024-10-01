@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class SchoolClass {
 
-    // Cria uma nova classe e associa alunos à classe atualizando o class_id na tabela student
+
     public void createClass(String name, String description, int teacherId) {
         Connection connection = null;
         try {
@@ -43,7 +43,7 @@ public class SchoolClass {
         }
     }
 
-    // Atualiza o class_id do aluno na tabela student
+
     public void updateStudentClass(int studentId, Integer classId) {
         Connection connection = null;
         try {
@@ -73,7 +73,7 @@ public class SchoolClass {
         }
     }
 
-    // Deleta uma classe
+
     public void deleteClass(int classId) {
         Connection connection = null;
         try {
@@ -87,7 +87,7 @@ public class SchoolClass {
                 if (rowsDeleted > 0) {
                     System.out.println("Classe deletada com sucesso.");
 
-                    // Atualiza o class_id dos alunos associados a essa classe para NULL
+
                     updateStudentClassForDeletedClass(classId);
                 } else {
                     System.out.println("Classe não encontrada.");
@@ -101,13 +101,11 @@ public class SchoolClass {
         }
     }
 
-    // Atualiza a classe (muda o professor e/ou os alunos)
     public void updateClass(int classId, Integer newTeacherId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
-            // Atualiza o professor da classe
             if (newTeacherId != null) {
                 String updateTeacherSQL = "UPDATE schoolClass SET teacher_id = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(updateTeacherSQL)) {
@@ -126,7 +124,7 @@ public class SchoolClass {
         }
     }
 
-    // Atualiza o class_id dos alunos para NULL quando a classe é deletada
+
     private void updateStudentClassForDeletedClass(int classId) {
         Connection connection = null;
         try {
@@ -146,7 +144,7 @@ public class SchoolClass {
         }
     }
 
-    // Visualiza todas as classes
+
     public void viewAllClasses() {
         Connection connection = null;
         try {

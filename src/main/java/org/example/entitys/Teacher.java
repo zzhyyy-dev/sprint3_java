@@ -14,7 +14,6 @@ public class Teacher {
         try {
             connection = DatabaseUtil.getConnection();
 
-            // Incluindo "class_id" no comando SELECT
             String selectSQL = "SELECT id, name, email, class_id FROM student";
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
                  ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -23,7 +22,6 @@ public class Teacher {
                     int id = resultSet.getInt("id");
                     String name = resultSet.getString("name");
                     String email = resultSet.getString("email");
-                    // Obtendo o "class_id" do aluno
                     int classId = resultSet.getInt("class_id");
 
                     System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Class ID: " + classId);
