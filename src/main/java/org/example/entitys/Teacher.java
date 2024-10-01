@@ -14,17 +14,19 @@ public class Teacher {
         try {
             connection = DatabaseUtil.getConnection();
 
-            String selectSQL = "SELECT * FROM student";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            // Incluindo "class_id" no comando SELECT
+            String selectSQL = "SELECT id, name, email, class_id FROM student";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int id = resultSet.getInt("id");
-                        String name = resultSet.getString("name");
-                        String email = resultSet.getString("email");
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String name = resultSet.getString("name");
+                    String email = resultSet.getString("email");
+                    // Obtendo o "class_id" do aluno
+                    int classId = resultSet.getInt("class_id");
 
-                        System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email);
-                    }
+                    System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email + ", Class ID: " + classId);
                 }
             }
 
@@ -34,6 +36,7 @@ public class Teacher {
             DatabaseUtil.closeConnection(connection);
         }
     }
+
 
     public void getExercises() {
         Connection connection = null;

@@ -6,16 +6,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 public class SchoolClass {
 
+    // Cria uma nova classe e associa alunos à classe atualizando o class_id na tabela student
     public void createClass(String name, String description, int teacherId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
-            String insertClassSQL = "INSERT INTO class (name, description, teacher_id) VALUES (?, ?, ?)";
+            String insertClassSQL = "INSERT INTO schoolClass (name, description, teacher_id) VALUES (?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertClassSQL, new String[]{"ID"})) {
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, description);
@@ -30,6 +30,7 @@ public class SchoolClass {
 
                 if (classId != -1) {
                     System.out.println("Classe criada com sucesso. ID da Classe: " + classId);
+
                 } else {
                     System.out.println("Erro ao criar a classe. ID da classe não gerado.");
                 }
@@ -42,6 +43,7 @@ public class SchoolClass {
         }
     }
 
+    // Atualiza o class_id do aluno na tabela student
     public void updateStudentClass(int studentId, Integer classId) {
         Connection connection = null;
         try {
@@ -71,28 +73,22 @@ public class SchoolClass {
         }
     }
 
-
+    // Deleta uma classe
     public void deleteClass(int classId) {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
-            // Atualiza o class_id dos alunos associados à classe para NULL antes de deletar a classe
-            String updateStudentsSQL = "UPDATE student SET class_id = NULL WHERE class_id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(updateStudentsSQL)) {
-                preparedStatement.setInt(1, classId);
-                preparedStatement.executeUpdate();
-                System.out.println("Alunos associados à classe com ID " + classId + " foram desassociados.");
-            }
-
-            // Depois de atualizar os alunos, agora é seguro deletar a classe
-            String deleteClassSQL = "DELETE FROM class WHERE id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteClassSQL)) {
+            String deleteSQL = "DELETE FROM schoolClass WHERE id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
                 preparedStatement.setInt(1, classId);
 
                 int rowsDeleted = preparedStatement.executeUpdate();
                 if (rowsDeleted > 0) {
                     System.out.println("Classe deletada com sucesso.");
+
+                    // Atualiza o class_id dos alunos associados a essa classe para NULL
+                    updateStudentClassForDeletedClass(classId);
                 } else {
                     System.out.println("Classe não encontrada.");
                 }
@@ -105,6 +101,7 @@ public class SchoolClass {
         }
     }
 
+    // Atualiza a classe (muda o professor e/ou os alunos)
     public void updateClass(int classId, Integer newTeacherId) {
         Connection connection = null;
         try {
@@ -112,13 +109,34 @@ public class SchoolClass {
 
             // Atualiza o professor da classe
             if (newTeacherId != null) {
-                String updateTeacherSQL = "UPDATE class SET teacher_id = ? WHERE id = ?";
+                String updateTeacherSQL = "UPDATE schoolClass SET teacher_id = ? WHERE id = ?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(updateTeacherSQL)) {
                     preparedStatement.setInt(1, newTeacherId);
                     preparedStatement.setInt(2, classId);
                     preparedStatement.executeUpdate();
                     System.out.println("Professor da classe atualizado com sucesso.");
                 }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DatabaseUtil.closeConnection(connection);
+        }
+    }
+
+    // Atualiza o class_id dos alunos para NULL quando a classe é deletada
+    private void updateStudentClassForDeletedClass(int classId) {
+        Connection connection = null;
+        try {
+            connection = DatabaseUtil.getConnection();
+
+            String updateSQL = "UPDATE student SET class_id = NULL WHERE class_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+                preparedStatement.setInt(1, classId);
+                preparedStatement.executeUpdate();
+                System.out.println("Alunos associados à classe deletada foram atualizados para não terem classe.");
             }
 
         } catch (SQLException e) {
@@ -128,14 +146,13 @@ public class SchoolClass {
         }
     }
 
-
-
+    // Visualiza todas as classes
     public void viewAllClasses() {
         Connection connection = null;
         try {
             connection = DatabaseUtil.getConnection();
 
-            String selectSQL = "SELECT id, name, description, teacher_id FROM class";
+            String selectSQL = "SELECT id, name, description, teacher_id FROM schoolClass";
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
                  ResultSet resultSet = preparedStatement.executeQuery()) {
 

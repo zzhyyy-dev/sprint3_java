@@ -136,13 +136,30 @@ public class Administrator {
                     System.out.println("Associações do aluno na tabela arcade removidas.");
                 }
 
+
                 String deleteCompetencesSQL = "DELETE FROM student_competences WHERE student_id = ?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(deleteCompetencesSQL)) {
                     preparedStatement.setInt(1, id);
                     preparedStatement.executeUpdate();
                     System.out.println("Associações do aluno na tabela student_competences removidas.");
                 }
+            } else if (userType.equalsIgnoreCase("teacher")) {
+                String updateSchoolClassSQL = "UPDATE SchoolClass SET teacher_id = NULL WHERE teacher_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateSchoolClassSQL)) {
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Associações do professor na tabela SchoolClass removidas.");
+                }
+
+
+                String updateChallengeSQL = "UPDATE challenge SET teacher_id = NULL WHERE teacher_id = ?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(updateChallengeSQL)) {
+                    preparedStatement.setInt(1, id);
+                    preparedStatement.executeUpdate();
+                    System.out.println("Associações do professor na tabela challenge removidas.");
+                }
             }
+
 
             String deleteSQL = "DELETE FROM " + userType + " WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -161,6 +178,7 @@ public class Administrator {
             DatabaseUtil.closeConnection(connection);
         }
     }
+
 
 
 
