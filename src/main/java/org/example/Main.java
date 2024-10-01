@@ -229,7 +229,8 @@ public class Main {
         while (!exit) {
             System.out.println("\n===== Menu do Professor =====");
             System.out.println("1 - Ler informações dos alunos");
-            System.out.println("2 - Sair");
+            System.out.println("2 - Ver exercícios disponíveis");
+            System.out.println("3 - Sair");
             System.out.print("Escolha uma opção: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -239,6 +240,9 @@ public class Main {
                     teacher.readStudents();
                     break;
                 case 2:
+                    teacher.getExercises();
+                    break;
+                case 3:
                     exit = true;
                     break;
                 default:
