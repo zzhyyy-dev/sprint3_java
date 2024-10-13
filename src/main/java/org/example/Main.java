@@ -4,9 +4,6 @@ import org.example.entitys.Users;
 import org.example.entitys.Administrator;
 import org.example.entitys.Teacher;
 import org.example.entitys.Student;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -20,6 +17,7 @@ public class Main {
             System.out.print("Digite o tipo de usuário (teacher, student, administrator): ");
             String userType = scanner.nextLine().toLowerCase();
 
+
             if (!userType.equals("teacher") && !userType.equals("student") && !userType.equals("administrator")) {
                 System.out.println("Tipo de usuário inválido. Tente novamente.");
                 continue;
@@ -31,13 +29,15 @@ public class Main {
             System.out.print("Digite sua senha: ");
             String password = scanner.nextLine();
 
+
             if (user.login(userType, email, password)) {
+
                 switch (user.getUserType()) {
                     case "administrator":
                         administratorMenu(scanner);
                         break;
                     case "teacher":
-                        teacherMenu(scanner);
+                        teacherMenu(scanner, user.getUserId());
                         break;
                     case "student":
                         studentMenu(scanner, user.getUserId());
@@ -51,8 +51,10 @@ public class Main {
                 System.out.println("Falha no login. Tentativa " + loginAttempts + " de 3.");
             }
         }
+
         System.out.println("Número máximo de tentativas alcançado. Programa encerrado.");
     }
+
 
     private static void administratorMenu(Scanner scanner) {
         Administrator admin = new Administrator();
@@ -185,29 +187,41 @@ public class Main {
         }
     }
 
-    private static void teacherMenu(Scanner scanner) {
-        Teacher teacher = new Teacher();
+    private static void teacherMenu(Scanner scanner, int teacherId) {
+        Teacher teacher = new Teacher(teacherId);
         boolean exit = false;
 
         while (!exit) {
             System.out.println("\n===== Menu do Professor =====");
             System.out.println("1 - Ler informações dos alunos");
             System.out.println("2 - Ver exercícios disponíveis");
-            System.out.println("3 - Sair");
+            System.out.println("3 - Criar uma nova Challenge");
+            System.out.println("4 - Sair");
             System.out.print("Escolha uma opção: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
                 case 1:
+
                     teacher.readStudents();
                     break;
+
                 case 2:
-                    teacher.getExercises();
+
+                    teacher.listExercises();
                     break;
+
                 case 3:
+
+                    teacher.createChallenge();
+                    break;
+
+                case 4:
+
                     exit = true;
                     break;
+
                 default:
                     System.out.println("Opção inválida. Tente novamente.");
             }
@@ -215,21 +229,34 @@ public class Main {
     }
 
     private static void studentMenu(Scanner scanner, int studentId) {
-        Student student = new Student();
+        Student student = new Student(studentId);
         boolean exit = false;
 
         while (!exit) {
             System.out.println("\n===== Menu do Estudante =====");
             System.out.println("1 - Ver informações do próprio cadastro");
-            System.out.println("2 - Sair");
+            System.out.println("2 - Ver competências e scores");
+            System.out.println("3 - Ver scores dos Challenges");
+            System.out.println("4 - Ver classe");
+            System.out.println("5 - Sair");
             System.out.print("Escolha uma opção: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
+
             switch (choice) {
                 case 1:
-                    student.viewProfile(studentId);
+                    student.viewProfile();
                     break;
                 case 2:
+                    student.viewCompetences();
+                    break;
+                case 3:
+                    student.viewChallengeScores();
+                    break;
+                case 4:
+                    student.viewClass();
+                    break;
+                case 5:
                     exit = true;
                     break;
                 default:
@@ -237,4 +264,6 @@ public class Main {
             }
         }
     }
+
+
 }

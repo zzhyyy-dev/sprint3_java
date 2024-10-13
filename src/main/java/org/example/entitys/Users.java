@@ -1,7 +1,5 @@
 package org.example.entitys;
-
 import org.example.utils.DatabaseUtil;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

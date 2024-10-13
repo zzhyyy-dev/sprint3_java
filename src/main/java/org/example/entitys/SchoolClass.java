@@ -1,14 +1,11 @@
 package org.example.entitys;
-
 import org.example.utils.DatabaseUtil;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SchoolClass {
-
 
     public void createClass(String name, String description, int teacherId) {
         Connection connection = null;
@@ -43,7 +40,6 @@ public class SchoolClass {
         }
     }
 
-
     public void updateStudentClass(int studentId, Integer classId) {
         Connection connection = null;
         try {
@@ -72,7 +68,6 @@ public class SchoolClass {
             DatabaseUtil.closeConnection(connection);
         }
     }
-
 
     public void deleteClass(int classId) {
         Connection connection = null;
@@ -124,7 +119,6 @@ public class SchoolClass {
         }
     }
 
-
     private void updateStudentClassForDeletedClass(int classId) {
         Connection connection = null;
         try {
@@ -143,7 +137,6 @@ public class SchoolClass {
             DatabaseUtil.closeConnection(connection);
         }
     }
-
 
     public void viewAllClasses() {
         Connection connection = null;
