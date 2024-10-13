@@ -172,4 +172,5 @@ A camada View foi desenvolvida em **React** e serve como a interface web que os 
 
 ### Conclusão
 
-Com a camada **Model** já implementada e a interface web disponível, o próximo passo é a construção da **camada Controller** usando **Spring Boot**. Essa camada fornecerá APIs para integrar a lógica da Model com a interface React, finalizando a arquitetura MVC e proporcionando uma aplicação web funcional e robusta.
+Nesse Repositório teremos a camada **model** e a camada **controller** que serão responsavéis pela conexão com banco e integração do sistema por um completo.
+
