@@ -29,7 +29,6 @@ public class ChallengeSession {
                 if (generatedKeys.next()) {
                     challengeSessionId = generatedKeys.getInt(1);
                 }
-
             }
             catch (SQLException e) {
                 e.printStackTrace();
